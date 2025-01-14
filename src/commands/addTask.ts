@@ -1,7 +1,7 @@
 import { App, moment } from "obsidian";
 import { timeNow, dateWithEmoji, durationFromStartTime, getNextDayDate, timeFromTask } from "src/utils/time";
 import { RecurringTask, recurringTasks } from "src/assets/recurringTasks";
-import { openOrCreateFileInSourceMode } from "src/utils/openOrCreateFileInSourceMode";
+import { openOrCreateFile } from "src/utils/openOrCreateFile";
 import { delay } from "src/utils/delay";
 import { TaskObject, testTaskObject } from "src/utils/tasks/formatTaskObject";
 import { formatTaskString } from "src/utils/tasks/formatTaskString";
@@ -40,7 +40,7 @@ const addTaskToFileFromPath = async (app: App, filePath: string | undefined | nu
   if (!filePath) throw new Error("No file path given");
   if (!newLineContent) throw new Error("No task text given");
 
-  const activeLeaf = await openOrCreateFileInSourceMode(app, filePath);
+  const activeLeaf = await openOrCreateFile(app, filePath, "source");
   await delay(100)
   await writeNewTaskInFile(activeLeaf, newLineContent);
 }
@@ -50,7 +50,7 @@ const adjustMostRecentTaskEndTime = async (app: App, task: TaskObject, mostRecen
   
   mostRecentTask.end = newTime
 
-  const activeLeaf = await openOrCreateFileInSourceMode(app, filePath);
+  const activeLeaf = await openOrCreateFile(app, filePath, "source");
   // @ts-ignore
   const editor = activeLeaf.view.editor;
   editor.setLine(mostRecentTask.metadata.line, formatTaskString(mostRecentTask))
@@ -333,8 +333,6 @@ export const addTask = async (app: App) => {
       task.start = timeFromTask(recentTaskChoosen, "after", "end")
     }
     testTaskObject(task)
-
-    console.log(task, 'TASK AFTER START');
 
     await askDuration(app, task, defaultTaskDuration, now);
     if (!task.end) return;

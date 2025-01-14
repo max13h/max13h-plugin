@@ -3,7 +3,7 @@ import { moveFileToBin } from './moveFileToBin';
 import { createProject } from './createProject';
 import { addTask } from './addTask';
 import type Max13hPlugin from 'main';
-import { getTasksFromDate } from 'src/utils/tasks/getTasksFromDate';
+import { catchQuickThinking } from './catchQuickThinking';
 
 export class Commands {
     private readonly plugin: Max13hPlugin;
@@ -32,18 +32,17 @@ export class Commands {
       });
 
       plugin.addCommand({
-        id: 'test',
-        name: 'test',
-        callback: async () => {
-          console.log(getTasksFromDate(this.app, "2025-01-14"));
-        }
-      });
-      plugin.addCommand({
         id: 'add-task',
         name: 'Add task',
         callback: () => addTask(this.app)
       });
-      
+
+      plugin.addCommand({
+        id: 'catch-quick-thinking',
+        name: 'Catch quick thinking',
+        callback: () => catchQuickThinking(this.app, plugin.settings)
+      });
+
       // plugin.addCommand({
       //   id: 'task-start-time-to-now',
       //   name: 'Task start time to now',

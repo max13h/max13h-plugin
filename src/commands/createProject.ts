@@ -1,5 +1,5 @@
 import { App } from 'obsidian';
-import { openOrCreateFileInSourceMode } from '../utils/openOrCreateFileInSourceMode';
+import { openOrCreateFile } from '../utils/openOrCreateFile';
 import { Max13hPluginSettings } from 'main';
 
 export const createProject = async (app: App, settings: Max13hPluginSettings) => {
@@ -11,5 +11,5 @@ export const createProject = async (app: App, settings: Max13hPluginSettings) =>
 
   const path = settings.binFolder + '/' + name
 
-  await openOrCreateFileInSourceMode(app, path, settings.projectTemplatePath)
+  await openOrCreateFile(app, path, "source", settings.projectTemplatePath)
 }

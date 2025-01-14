@@ -1,13 +1,13 @@
 import { App } from 'obsidian';
 import type { TFile } from 'obsidian';
 
-const openFile = async (app: App, filePath: TFile) => {
+const openFile = async (app: App, filePath: TFile, mode: "source" | "preview") => {
   const activeLeaf = app.workspace.getLeaf() || app.workspace.getLeaf('tab')
   await activeLeaf.openFile(filePath);
 
   const view = activeLeaf.getViewState();
   if (!view || !view.state) throw new Error("View not found");
-  view.state.mode = 'source';
+  view.state.mode = mode;
   activeLeaf.setViewState(view);
   // Give focus to the new leaf
   app.workspace.setActiveLeaf(activeLeaf, { focus: true });
@@ -19,7 +19,7 @@ const openFile = async (app: App, filePath: TFile) => {
   }
 }
 
-export const openOrCreateFileInSourceMode = async (app: App, path: string, templatePath?: string) => {
+export const openOrCreateFile = async (app: App, path: string, mode: "source" | "preview", templatePath?: string) => {
   // Get the index of the last slash in the path
   const lastSlashIndex = path.lastIndexOf('/');
   
@@ -42,7 +42,7 @@ export const openOrCreateFileInSourceMode = async (app: App, path: string, templ
   const existingFolder = folderPath ? app.vault.getAbstractFileByPath(folderPath) : true ;
 
   if (existingFile) {
-    return openFile(app, existingFile as TFile)
+    return openFile(app, existingFile as TFile, mode)
   } else {
     if (!existingFolder) await app.vault.createFolder(folderPath);
 
@@ -56,6 +56,6 @@ export const openOrCreateFileInSourceMode = async (app: App, path: string, templ
     }
     const content = templateFile ? await app.vault.read(templateFile as any) : ''
     const newFile = await app.vault.create(formattedFilePath, content);
-    return openFile(app, newFile as TFile)
+    return openFile(app, newFile as TFile, mode)
   }
 }

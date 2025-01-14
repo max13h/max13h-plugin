@@ -38,5 +38,17 @@ export class Max13hSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+    new Setting(containerEl)
+      .setName('Daily note template')
+      .setDesc("Set path of the daily note template file (for 'catch quick thinking' command)")
+      .addText((text) =>
+        text
+          .setPlaceholder('templates/daily note')
+          .setValue(this.plugin.settings.dailyNoteTemplatePath)
+          .onChange(async (value) => {
+            this.plugin.settings.dailyNoteTemplatePath = value;
+            await this.plugin.saveSettings();
+          })
+      );
   }
 }
