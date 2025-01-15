@@ -8,7 +8,13 @@ export const timeBeforeFromNow = (durationInMinutes = 0) => moment().subtract(du
 
 export const timeLaterFromNow = (durationInMinutes = 0) => moment().add(durationInMinutes, 'minutes').format('HH:mm');
 
-export const durationFromStartTime = (start: string, durationInMinutes = 0) => moment(start, 'HH:mm').add(durationInMinutes, 'minutes').format('HH:mm');
+export const timeFromDurationAndStartTime = (start: string, durationInMinutes: number, beforeOrAfter: "before" | "after") =>{
+  if (beforeOrAfter === "before") {
+    return moment(start, 'HH:mm').subtract(durationInMinutes, 'minutes').format('HH:mm');
+  } else {
+    return moment(start, 'HH:mm').add(durationInMinutes, 'minutes').format('HH:mm');
+  }
+}
 
 export const timeFromTask = (task: TaskObject | null, beforeOrAfter: "before" | "after", startOrEnd: "start" | "end", distance: number = 1) => {
   if (!task || !task[startOrEnd]) return undefined

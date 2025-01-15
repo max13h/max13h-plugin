@@ -1,25 +1,33 @@
 import { App, moment } from "obsidian";
-import { durationFromStartTime, timeFromTask } from "src/utils/time";
+import { timeFromDurationAndStartTime, timeFromTask } from "src/utils/time";
 import { TaskObject } from "../formatTaskObject";
 import { openSuggester } from "src/modal/suggesterModal";
 import { openHourModal } from "src/modal/hourModal";
 import { RecentTaskChoosen, TasksByClosenessToNow } from "../sortTasksByClosenessToNow";
 import { askChooseRecentTask } from "./askChooseRecentTask";
 
-export const askStart = async (app: App, task: TaskObject, tasksByClosenessToNow: TasksByClosenessToNow | null, recentTaskChoosen: RecentTaskChoosen,  today: string, now: string): Promise<string | undefined> => {
+export const askStart = async (app: App, task: TaskObject, tasksByClosenessToNow: TasksByClosenessToNow | null, recentTaskChoosen: RecentTaskChoosen,  todayWithEmoji: string, now: string, isModifying: boolean = false): Promise<string | undefined> => {
   const hasRecentTask = (tasksByClosenessToNow?.timeSorted.length || 0) > 0
 
   let used = [
     "Personnalize",
     "No start",
-    durationFromStartTime(now, 5),
-    durationFromStartTime(now, 10),
-    durationFromStartTime(now, 15),
-    durationFromStartTime(now, 20),
-    durationFromStartTime(now, 25),
-    durationFromStartTime(now, 30),
-    durationFromStartTime(now, 45),
-    durationFromStartTime(now, 60),
+    timeFromDurationAndStartTime(now, 5, "after"),
+    timeFromDurationAndStartTime(now, 10, "after"),
+    timeFromDurationAndStartTime(now, 15, "after"),
+    timeFromDurationAndStartTime(now, 20, "after"),
+    timeFromDurationAndStartTime(now, 25, "after"),
+    timeFromDurationAndStartTime(now, 30, "after"),
+    timeFromDurationAndStartTime(now, 45, "after"),
+    timeFromDurationAndStartTime(now, 60, "after"),
+    timeFromDurationAndStartTime(now, 5, "before"),
+    timeFromDurationAndStartTime(now, 10, "before"),
+    timeFromDurationAndStartTime(now, 15, "before"),
+    timeFromDurationAndStartTime(now, 20, "before"),
+    timeFromDurationAndStartTime(now, 25, "before"),
+    timeFromDurationAndStartTime(now, 30, "before"),
+    timeFromDurationAndStartTime(now, 45, "before"),
+    timeFromDurationAndStartTime(now, 60, "before"),
   ]
   let displayed = [
     `✏️ Personnaliser`,
@@ -32,6 +40,14 @@ export const askStart = async (app: App, task: TaskObject, tasksByClosenessToNow
     `🕔 Dans 30 minutes (${used[7]})`,
     `🕔 Dans 45 minutes (${used[8]})`,
     `🕔 Dans 60 minutes (${used[9]})`,
+    `⌛ Il y a 5 minutes (${used[10]})`,
+    `⌛ Il y a 10 minutes (${used[11]})`,
+    `⌛ Il y a 15 minutes (${used[12]})`,
+    `⌛ Il y a 20 minutes (${used[13]})`,
+    `⌛ Il y a 25 minutes (${used[14]})`,
+    `⌛ Il y a 30 minutes (${used[15]})`,
+    `⌛ Il y a 45 minutes (${used[16]})`,
+    `⌛ Il y a 60 minutes (${used[17]})`,
   ]
 
   if (hasRecentTask) {
@@ -39,7 +55,7 @@ export const askStart = async (app: App, task: TaskObject, tasksByClosenessToNow
     used.splice(2, 0, "Recent task")
   }
 
-  if (task.start) {
+  if (!isModifying && task.start) {
     const recurringIsSameAsNow = (task.start === now)
 
     if (!recurringIsSameAsNow) {
@@ -53,10 +69,15 @@ export const askStart = async (app: App, task: TaskObject, tasksByClosenessToNow
     used.unshift(now)
   }
 
-  if (task.emojiProperties?.scheduled !== today) {
+  if (!isModifying && task.emojiProperties?.scheduled !== todayWithEmoji) {
     displayed = ["🤷 Ne pas encore donner d'heure de début", "✏️ Personnaliser"]
     used = ["No start", "Personnalize"]
-  } 
+  }
+
+  if (isModifying && task.start) {
+    displayed.unshift(`Garder l'heure actuelle (${task.start})`)
+    used.unshift("Keep actual")
+  }
 
   const answer = !task.emojiProperties?.scheduled && !task.start 
   ? "No start" 
@@ -70,10 +91,12 @@ export const askStart = async (app: App, task: TaskObject, tasksByClosenessToNow
   if (answer === "Personnalize") {
     return task.start = await openHourModal(app, 'Renseignez une heure') || undefined
   } else if (answer === "Recent task" && tasksByClosenessToNow) {
-    recentTaskChoosen.value = await askChooseRecentTask(app, tasksByClosenessToNow, false, now)
+    recentTaskChoosen.value = await askChooseRecentTask(app, task, tasksByClosenessToNow, false, now)
     if (!recentTaskChoosen.value) return
 
     return task.start = timeFromTask(recentTaskChoosen.value, "after", "end")
+  } else if (answer === "Keep actual") {
+    return task.start = task.start
   } else {
     return task.start = answer?.toString()
   }

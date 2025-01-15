@@ -2,9 +2,8 @@ import { App, moment } from "obsidian";
 import { timeNow, dateWithEmoji, timeFromTask } from "src/utils/time";
 import { openOrCreateFile } from "src/utils/openOrCreateFile";
 import { delay } from "src/utils/delay";
-import { TaskObject, testTaskObject } from "src/utils/tasks/formatTaskObject";
+import { testTaskObject } from "src/utils/tasks/formatTaskObject";
 import { formatTaskString } from "src/utils/tasks/formatTaskString";
-import { openSuggester } from "src/modal/suggesterModal";
 import { getTasksFromDate } from "src/utils/tasks/getTasksFromDate";
 import { RecentTaskChoosen, sortTasksByClosenessToNow } from "src/utils/tasks/sortTasksByClosenessToNow";
 import { askStart } from "src/utils/tasks/ask/askStart";
@@ -15,6 +14,7 @@ import { askPath } from "src/utils/tasks/ask/askPath";
 import { askDate } from "src/utils/tasks/ask/askDate";
 import { askNewTask } from "src/utils/tasks/ask/askNewTask";
 import { askChooseRecentTask } from "src/utils/tasks/ask/askChooseRecentTask";
+import { adjustRecentTaskEndTime } from "src/utils/tasks/adjustRecentTaskEndTime";
 
 const writeNewTaskInFile = async (activeLeaf: any, newLineContent: string) => {
   const editor = activeLeaf.view.editor;
@@ -47,17 +47,6 @@ const addTaskToFileFromPath = async (app: App, filePath: string | undefined | nu
   const activeLeaf = await openOrCreateFile(app, filePath, "source");
   await delay(100)
   await writeNewTaskInFile(activeLeaf, newLineContent);
-}
-const adjustMostRecentTaskEndTime = async (app: App, task: TaskObject, mostRecentTask: TaskObject, newTime: string) => {
-  const filePath = mostRecentTask.metadata.path
-  if (!filePath) throw new Error("Most recent task has no file path");
-  
-  mostRecentTask.end = newTime
-
-  const activeLeaf = await openOrCreateFile(app, filePath, "source");
-  // @ts-ignore
-  const editor = activeLeaf.view.editor;
-  editor.setLine(mostRecentTask.metadata.line, formatTaskString(mostRecentTask))
 }
 
 export const addTask = async (app: App) => {
@@ -102,7 +91,6 @@ export const addTask = async (app: App) => {
   if (!task.start) return
 
   if (task.start !== 'No start') {
-    testTaskObject(task)
 
     await askDuration(app, task, defaultTaskDuration, now);
     if (!task.end) return;
@@ -125,10 +113,13 @@ export const addTask = async (app: App) => {
   const isDifferentEndTime = recentTaskNewEndTime !== recentTaskChoosen.value?.end
 
   if (isScheduledDateIsFormatedAndToday && recentTaskNewEndTime && tasksByClosenessToNow && ((tasksByClosenessToNow?.timeSorted.length || 0) > 0) && isDifferentEndTime) {
-    if (!recentTaskChoosen.value) recentTaskChoosen.value = await askChooseRecentTask(app, tasksByClosenessToNow, true, now, "Choisir la tâche récente à raccorder au début de la nouvelle")
+    if (!recentTaskChoosen.value) recentTaskChoosen.value = await askChooseRecentTask(app, task, tasksByClosenessToNow, true, now, "Choisir la tâche récente à raccorder au début de la nouvelle")
 
-    if (recentTaskChoosen.value) await adjustMostRecentTaskEndTime(app, task, recentTaskChoosen.value, recentTaskNewEndTime)
-  } 
+    if (recentTaskChoosen.value) {
+      await adjustRecentTaskEndTime(app, recentTaskChoosen.value, recentTaskNewEndTime)
+      await delay(200)
+    }
+  }
   // ===
 
   const newLine = formatTaskString(task);

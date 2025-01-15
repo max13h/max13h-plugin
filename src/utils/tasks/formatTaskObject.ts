@@ -143,14 +143,23 @@ const sendNoticeAndThrowError = (value: string) => {
 }
 
 export const testTaskObject = (task: TaskObject) => {
+  const momentStart = moment(task.start, "HH:mm")
+  const momentEnd = moment(task.end, "HH:mm")
+  const isTaskStartBeforeEnd = momentStart.diff(momentEnd) < 0
+
   if (task.status && ![' ', 'x', '/', '-'].includes(task.status || '')) {
     sendNoticeAndThrowError('STATUS')
   }
-  if (task.start && !moment(task.start, 'HH:mm', true).isValid()) {
+  if (task.start && !momentStart.isValid()) {
     sendNoticeAndThrowError('START')
   }
-  if (task.end && !moment(task.end, 'HH:mm', true).isValid()) {
+  if (task.end && !momentEnd.isValid()) {
+    console.log(task);
     sendNoticeAndThrowError('END')
+  }
+  if (task.start && task.end && !isTaskStartBeforeEnd) {
+    console.log('bien dedans');
+    sendNoticeAndThrowError('START AND END')
   }
   if (task.tags?.length && task.tags?.some(tag => !tag.startsWith('#'))) {
     sendNoticeAndThrowError('TAGS')
