@@ -1,6 +1,8 @@
-import { App } from "obsidian"
+import { openSuggester } from "src/modal/suggesterModal"
+import { App, moment } from "obsidian"
 import { TaskObject } from "../formatTaskObject"
 import { dateWithEmoji, getNextDayDate } from "src/utils/time"
+import { openDateModal } from "src/modal/dateModal"
 
 export const askDate = async (app: App, task: TaskObject, today: string) => {
   const displayed = [
