@@ -6,6 +6,10 @@ export interface TasksByClosenessToNow {
   withoutTime: TaskObject[];
 }
 
+export interface RecentTaskChoosen { 
+  value: TaskObject | null
+}
+
 export const sortTasksByClosenessToNow = (tasksFromDate: TaskObject[]): TasksByClosenessToNow | null => {
   const now = moment();
 

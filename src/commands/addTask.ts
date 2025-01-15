@@ -6,15 +6,15 @@ import { TaskObject, testTaskObject } from "src/utils/tasks/formatTaskObject";
 import { formatTaskString } from "src/utils/tasks/formatTaskString";
 import { openSuggester } from "src/modal/suggesterModal";
 import { getTasksFromDate } from "src/utils/tasks/getTasksFromDate";
-import { sortTasksByClosenessToNow } from "src/utils/tasks/sortTasksByClosenessToNow";
+import { RecentTaskChoosen, sortTasksByClosenessToNow } from "src/utils/tasks/sortTasksByClosenessToNow";
 import { askStart } from "src/utils/tasks/ask/askStart";
 import { askTaskText } from "src/utils/tasks/ask/askTaskText";
 import { askDuration } from "src/utils/tasks/ask/askDuration";
-import { askAdjustRecentTaskEndTime } from "src/utils/tasks/ask/askAdjustRecentTaskEndTime";
 import { askTaskGroup } from "src/utils/tasks/ask/askTaskGroup";
 import { askPath } from "src/utils/tasks/ask/askPath";
 import { askDate } from "src/utils/tasks/ask/askDate";
 import { askNewTask } from "src/utils/tasks/ask/askNewTask";
+import { askChooseRecentTask } from "src/utils/tasks/ask/askChooseRecentTask";
 
 const writeNewTaskInFile = async (activeLeaf: any, newLineContent: string) => {
   const editor = activeLeaf.view.editor;
@@ -72,7 +72,6 @@ export const addTask = async (app: App) => {
       const newLine = formatTaskString(task);
       await addTaskToFileFromPath(app, task.metadata?.path, newLine)
       await delay(1000)
-
       return
     })
     return
@@ -96,32 +95,13 @@ export const addTask = async (app: App) => {
 
   const tasksFromToday = getTasksFromDate(app, today.slice(2))
   const tasksByClosenessToNow = tasksFromToday.length ? sortTasksByClosenessToNow(tasksFromToday) : null
-  let recentTaskChoosen
+  const recentTaskChoosen: RecentTaskChoosen = { value: null }
   const defaultTaskDuration = task.start && task.end ? moment(task.end, 'HH:mm').diff(moment(task.start, 'HH:mm'), 'minutes') : 0;
 
-  await askStart(app, task, ((tasksByClosenessToNow?.timeSorted.length || 0) > 0), today, now)
+  await askStart(app, task, tasksByClosenessToNow, recentTaskChoosen, today, now)
   if (!task.start) return
 
   if (task.start !== 'No start') {
-    if (task.start === 'Recent task' && tasksByClosenessToNow?.timeSorted) {
-      recentTaskChoosen = await openSuggester(app, {
-        displayedValues: tasksByClosenessToNow.timeSorted.map(taskInFile => {
-          const timeDiff = moment(taskInFile.end, 'HH:mm').diff(moment(), 'minutes');
-          const hours = Math.floor(Math.abs(timeDiff) / 60);
-          const minutes = Math.abs(timeDiff) % 60;
-          const diffString = (timeDiff > 0 
-            ? 'Dans '
-            : 'Il y a ')
-              + (hours > 0 ? hours + 'h ' : '') + minutes + 'm';
-          return `${taskInFile.start} - ${taskInFile.end} ${taskInFile.text?.slice(0, 5)} (${diffString})`
-        }),
-        usedValues: tasksByClosenessToNow.timeSorted,
-        title: `Choisir la tâche récente référente`,
-        description: `Heure actuelle: ${now}`
-      })
-
-      task.start = timeFromTask(recentTaskChoosen, "after", "end")
-    }
     testTaskObject(task)
 
     await askDuration(app, task, defaultTaskDuration, now);
@@ -141,17 +121,14 @@ export const addTask = async (app: App) => {
   // ask doWeAdjustRecentTaskEndTime
   const momentScheduledDate = moment(task.emojiProperties.scheduled?.slice(2), 'YYYY-MM-DD');
   const isScheduledDateIsFormatedAndToday = momentScheduledDate.isValid() && (momentScheduledDate.format('YYYY-MM-DD') == today.slice(2))
+  const recentTaskNewEndTime = timeFromTask(task, "before", "start")
+  const isDifferentEndTime = recentTaskNewEndTime !== recentTaskChoosen.value?.end
 
-  const newTime = timeFromTask(task, "before", "start")
-  if (newTime && newTime !== recentTaskChoosen?.end) {
-    const doWeAdjustRecentTaskEndTime = (isScheduledDateIsFormatedAndToday && !!recentTaskChoosen) 
-    ? await askAdjustRecentTaskEndTime(app, task, recentTaskChoosen, newTime)
-    : false;
-    // AJUSTER LA TACHE RECENTE 
+  if (isScheduledDateIsFormatedAndToday && recentTaskNewEndTime && tasksByClosenessToNow && ((tasksByClosenessToNow?.timeSorted.length || 0) > 0) && isDifferentEndTime) {
+    if (!recentTaskChoosen.value) recentTaskChoosen.value = await askChooseRecentTask(app, tasksByClosenessToNow, true, now, "Choisir la tâche récente à raccorder au début de la nouvelle")
 
-  if (doWeAdjustRecentTaskEndTime && recentTaskChoosen) adjustMostRecentTaskEndTime(app, task, recentTaskChoosen, newTime)
-  }
-
+    if (recentTaskChoosen.value) await adjustMostRecentTaskEndTime(app, task, recentTaskChoosen.value, recentTaskNewEndTime)
+  } 
   // ===
 
   const newLine = formatTaskString(task);

@@ -1,10 +1,14 @@
-import { App } from "obsidian";
-import { durationFromStartTime } from "src/utils/time";
+import { App, moment } from "obsidian";
+import { durationFromStartTime, timeFromTask } from "src/utils/time";
 import { TaskObject } from "../formatTaskObject";
 import { openSuggester } from "src/modal/suggesterModal";
 import { openHourModal } from "src/modal/hourModal";
+import { RecentTaskChoosen, TasksByClosenessToNow } from "../sortTasksByClosenessToNow";
+import { askChooseRecentTask } from "./askChooseRecentTask";
 
-export const askStart = async (app: App, task: TaskObject, hasRecentTask: boolean, today: string, now: string): Promise<string | undefined> => {
+export const askStart = async (app: App, task: TaskObject, tasksByClosenessToNow: TasksByClosenessToNow | null, recentTaskChoosen: RecentTaskChoosen,  today: string, now: string): Promise<string | undefined> => {
+  const hasRecentTask = (tasksByClosenessToNow?.timeSorted.length || 0) > 0
+
   let used = [
     "Personnalize",
     "No start",
@@ -65,6 +69,11 @@ export const askStart = async (app: App, task: TaskObject, hasRecentTask: boolea
 
   if (answer === "Personnalize") {
     return task.start = await openHourModal(app, 'Renseignez une heure') || undefined
+  } else if (answer === "Recent task" && tasksByClosenessToNow) {
+    recentTaskChoosen.value = await askChooseRecentTask(app, tasksByClosenessToNow, false, now)
+    if (!recentTaskChoosen.value) return
+
+    return task.start = timeFromTask(recentTaskChoosen.value, "after", "end")
   } else {
     return task.start = answer?.toString()
   }
