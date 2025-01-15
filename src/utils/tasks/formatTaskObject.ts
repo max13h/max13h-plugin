@@ -99,7 +99,7 @@ const extractEmojiProperties = (text: string): [TaskObject['emojiProperties'], s
   ]
 };
 
-export const formatTaskObject = (task: string, additional?: { status: TaskObject['status'], metadata: TaskMetadata }) => {
+export const formatTaskObject = (task: string, additional?: { status?: TaskObject['status'], metadata?: TaskMetadata }) => {
   const isFullTaskString = task.trim().startsWith("- [")
   if (!isFullTaskString && !additional) throw new Error("Missing informations about the task given");
 

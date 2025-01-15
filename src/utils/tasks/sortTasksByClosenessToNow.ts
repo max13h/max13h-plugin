@@ -1,8 +1,15 @@
 import { moment } from "obsidian";
 import { TaskObject } from "./formatTaskObject";
 
-export const sortTasksByClosenessToNow = (tasksFromDate: TaskObject[]) => {
+export interface TasksByClosenessToNow {
+  timeSorted: TaskObject[];
+  withoutTime: TaskObject[];
+}
+
+export const sortTasksByClosenessToNow = (tasksFromDate: TaskObject[]): TasksByClosenessToNow | null => {
   const now = moment();
+
+  if (!tasksFromDate.length) return null
 
   const tasksWithoutTime = tasksFromDate.filter(task => !task.start || !task.end)
   const tasksWithTimeSorted = tasksFromDate.filter(task => task.start && task.end)
