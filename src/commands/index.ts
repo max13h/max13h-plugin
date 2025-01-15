@@ -4,6 +4,7 @@ import { createProject } from './createProject';
 import { addTask } from './addTask';
 import type Max13hPlugin from 'main';
 import { catchQuickThinking } from './catchQuickThinking';
+import { updateTaskTime } from './updateTaskTime';
 
 export class Commands {
     private readonly plugin: Max13hPlugin;
@@ -27,20 +28,29 @@ export class Commands {
       plugin.addCommand({
         id: 'create-project',
         name: 'Create project',
-        icon: 'folder-open-dot',
+        icon: 'folder-heart',
         callback: () => createProject(this.app, plugin.settings)
       });
 
       plugin.addCommand({
         id: 'add-task',
         name: 'Add task',
+        icon: 'check-check',
         callback: () => addTask(this.app)
       });
 
       plugin.addCommand({
         id: 'catch-quick-thinking',
         name: 'Catch quick thinking',
+        icon: 'zap',
         callback: () => catchQuickThinking(this.app, plugin.settings)
+      });
+      
+      plugin.addCommand({
+        id: 'update-task-time',
+        name: 'Update task time',
+        icon: 'watch',
+        callback: () => updateTaskTime(this.app)
       });
 
       // plugin.addCommand({
