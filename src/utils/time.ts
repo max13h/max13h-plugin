@@ -63,3 +63,5 @@ export const dateWithEmoji = (date: string) => {
     return `\u23F3 ${parsedDate.format('YYYY-MM-DD')}`;
   }
 }
+
+export const dateToday = () => moment().format('YYYY-MM-DD')
