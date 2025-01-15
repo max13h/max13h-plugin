@@ -154,11 +154,9 @@ export const testTaskObject = (task: TaskObject) => {
     sendNoticeAndThrowError('START')
   }
   if (task.end && !momentEnd.isValid()) {
-    console.log(task);
     sendNoticeAndThrowError('END')
   }
   if (task.start && task.end && !isTaskStartBeforeEnd) {
-    console.log('bien dedans');
     sendNoticeAndThrowError('START AND END')
   }
   if (task.tags?.length && task.tags?.some(tag => !tag.startsWith('#'))) {

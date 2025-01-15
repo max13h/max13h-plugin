@@ -16,15 +16,15 @@ export const timeFromDurationAndStartTime = (start: string, durationInMinutes: n
   }
 }
 
-export const timeFromTask = (task: TaskObject | null, beforeOrAfter: "before" | "after", startOrEnd: "start" | "end", distance: number = 1) => {
+export const timeFromTask = (task: TaskObject | null, beforeOrAfter: "before" | "after", startOrEnd: "start" | "end", distanceInMinutes: number = 1) => {
   if (!task || !task[startOrEnd]) return undefined
 
   const time = moment(task[startOrEnd], 'HH:mm');
 
   if (beforeOrAfter === "before") {
-    time.subtract(distance, 'minutes').format('HH:mm')
+    time.subtract(distanceInMinutes, 'minutes').format('HH:mm')
   } else if (beforeOrAfter === "after") {
-    time.add(distance, 'minutes').format('HH:mm')
+    time.add(distanceInMinutes, 'minutes').format('HH:mm')
   }
   return time.format('HH:mm')
 }

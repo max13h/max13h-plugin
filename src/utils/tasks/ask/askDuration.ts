@@ -32,16 +32,19 @@ export const askDuration = async (app: App, task: TaskObject, defaultTaskDuratio
   ]
 
   const momentStart = moment(task.start, "HH:mm")
+  const momentEnd = moment(task.end, "HH:mm")
   const momentNow = moment(now, "HH:mm")
   const isTaskStartBeforeNow = momentStart.diff(momentNow) < 0
+  const isTaskStartBeforeOneHourBeforeNow = momentStart.diff(momentNow.subtract(1, "hour").subtract(1, "minute")) < 0
+  const isTaskStartBeforeActualEnd = momentStart.diff(momentEnd) < 0
+
 
   if (isTaskStartBeforeNow) {
     used.unshift(now)
     displayed.unshift('⚡ Finir maintenant')
   }
 
-  const isTaskStartBeforeOneHour = momentStart.diff(momentNow.subtract(1, "hour").subtract(1, "minute")) < 0
-  if (isTaskStartBeforeOneHour) {
+  if (isTaskStartBeforeOneHourBeforeNow) {
     const addedUsed = [
       timeFromDurationAndStartTime(now, 5, "before"),
       timeFromDurationAndStartTime(now, 10, "before"),
@@ -77,7 +80,7 @@ export const askDuration = async (app: App, task: TaskObject, defaultTaskDuratio
     displayed.unshift(`🏳️ Durée par défaut (30 minutes) (end: ${time})`)
   }
 
-  if (isModifying && task.end) {
+  if (isModifying && task.end && isTaskStartBeforeActualEnd) {
     displayed.unshift(`Garder l'heure actuelle (${task.end})`)
     used.unshift("Keep actual")
   }

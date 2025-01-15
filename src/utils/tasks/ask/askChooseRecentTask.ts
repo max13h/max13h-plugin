@@ -14,8 +14,6 @@ export const askChooseRecentTask = async (app: App, task: TaskObject, tasksByClo
     return !isSameTask
   })
 
-  console.log('tasksByClosenessToNowWithoutActualTask', tasksByClosenessToNowWithoutActualTask);
-
   const displayed: string[] = [...tasksByClosenessToNowWithoutActualTask.map(taskInFile => {
     const timeDiff = moment(taskInFile.end, 'HH:mm').diff(moment(), 'minutes');
     const hours = Math.floor(Math.abs(timeDiff) / 60);

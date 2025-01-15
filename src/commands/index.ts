@@ -5,6 +5,7 @@ import { addTask } from './addTask';
 import type Max13hPlugin from 'main';
 import { catchQuickThinking } from './catchQuickThinking';
 import { updateTaskTime } from './updateTaskTime';
+import { duplicateActualTask } from './duplicateActualTask';
 
 export class Commands {
     private readonly plugin: Max13hPlugin;
@@ -52,6 +53,20 @@ export class Commands {
         icon: 'watch',
         callback: () => updateTaskTime(this.app)
       });
+      
+      plugin.addCommand({
+        id: 'duplicate-actual-task',
+        name: 'Duplicate actual task',
+        icon: 'gallery-horizontal-end',
+        editorCallback: (editor: Editor) => {
+          const cursor = editor.getCursor();
+          if (!cursor) return;
+          const lineContent = editor.getLine(cursor.line);
+          if (!lineContent.startsWith("- [")) return;
+          duplicateActualTask(editor, cursor, lineContent);
+        }
+      });
+      
 
       // plugin.addCommand({
       //   id: 'task-start-time-to-now',
