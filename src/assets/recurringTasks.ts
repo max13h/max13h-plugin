@@ -30,7 +30,7 @@ export const recurringTasks = (): RecurringTask[] => {
           end: "06:30",
           text: "🌙 Sommeil matin",
           emojiProperties: {
-            scheduled: dateWithEmoji('today')
+            scheduled: dateWithEmoji('tomorrow')
           },
           metadata: {
             path: "_bin/Hygiène de vie.md"

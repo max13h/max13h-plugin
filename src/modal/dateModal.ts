@@ -46,6 +46,18 @@ export class dateModal extends Modal {
           });
         }, 1000)
       })
+
+    new Setting(this.contentEl)
+    .addButton((btn) =>
+      btn
+        .setButtonText('Continuer')
+        .setCta()
+        .onClick(() => {
+          if (this.resolvePromise) {
+            this.resolvePromise(this.valueOfInput);
+          }
+          this.close()
+        }));
   }
 
   async open(): Promise<string | null> {
