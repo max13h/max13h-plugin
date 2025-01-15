@@ -33,7 +33,7 @@ export const askDuration = async (app: App, task: TaskObject, defaultTaskDuratio
 
   if (task.start !== now) {
     used.unshift(now)
-    displayed.unshift('⚡ Maintenant')
+    displayed.unshift('⚡ Finir maintenant')
   }
 
   if (task.end && defaultTaskDuration) {
