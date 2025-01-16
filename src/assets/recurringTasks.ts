@@ -103,7 +103,7 @@ export const recurringTasks = (): RecurringTask[] => {
             status: " ",
             text: "🪥 Brossage des dents",
             start: timeNow(),
-            end: timeLaterFromNow(15),
+            end: timeLaterFromNow(5),
             emojiProperties: {
               scheduled: dateWithEmoji('today')
             },

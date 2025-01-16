@@ -1,4 +1,6 @@
 import { App, moment } from "obsidian";
+import { delay } from "src/utils/delay";
+import { openOrCreateFile } from "src/utils/openOrCreateFile";
 import { adjustRecentTaskEndTime } from "src/utils/tasks/adjustRecentTaskEndTime";
 import { askChooseRecentTask } from "src/utils/tasks/ask/askChooseRecentTask";
 import { askDate } from "src/utils/tasks/ask/askDate";
@@ -56,8 +58,14 @@ export const updateTaskTime = async (app: App) => {
   if (isScheduledDateIsFormatedAndToday && recentTaskNewEndTime && tasksByClosenessToNow && ((tasksByClosenessToNow?.timeSorted.length || 0) > 0) && isDifferentEndTime) {
     if (!recentTaskChoosen.value) recentTaskChoosen.value = await askChooseRecentTask(app, task, tasksByClosenessToNow, true, now, "Choisir la tâche récente à raccorder au début de la nouvelle")
 
-    if (recentTaskChoosen.value) await adjustRecentTaskEndTime(app, recentTaskChoosen.value, recentTaskNewEndTime)
+    if (recentTaskChoosen.value) {
+      await adjustRecentTaskEndTime(app, recentTaskChoosen.value, recentTaskNewEndTime)
+    }
   }
+  await delay(100)
+  if (task.metadata.path) await openOrCreateFile(app, task.metadata.path, "source");
+  await delay(100)
+
   //==
 
   const lineNewContent = formatTaskString(task)

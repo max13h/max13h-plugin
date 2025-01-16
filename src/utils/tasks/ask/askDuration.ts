@@ -9,26 +9,26 @@ export const askDuration = async (app: App, task: TaskObject, defaultTaskDuratio
 
   const used = [
     'Personnalize',
-    timeFromDurationAndStartTime(now, 5, "after"),
-    timeFromDurationAndStartTime(now, 10, "after"),
-    timeFromDurationAndStartTime(now, 15, "after"),
-    timeFromDurationAndStartTime(now, 20, "after"),
-    timeFromDurationAndStartTime(now, 25, "after"),
-    timeFromDurationAndStartTime(now, 30, "after"),
-    timeFromDurationAndStartTime(now, 45, "after"),
-    timeFromDurationAndStartTime(now, 60, "after")
+    timeFromDurationAndStartTime(task.start, 5, "after"),
+    timeFromDurationAndStartTime(task.start, 10, "after"),
+    timeFromDurationAndStartTime(task.start, 15, "after"),
+    timeFromDurationAndStartTime(task.start, 20, "after"),
+    timeFromDurationAndStartTime(task.start, 25, "after"),
+    timeFromDurationAndStartTime(task.start, 30, "after"),
+    timeFromDurationAndStartTime(task.start, 45, "after"),
+    timeFromDurationAndStartTime(task.start, 60, "after")
   ] 
 
   const displayed = [
     '✏️ Personnaliser',
-    `🕔 Dans 5 minutes (${used[1]})`,
-    `🕔 Dans 10 minutes (${used[2]})`,
-    `🕔 Dans 15 minutes (${used[3]})`,
-    `🕔 Dans 20 minutes (${used[4]})`,
-    `🕔 Dans 25 minutes (${used[5]})`,
-    `🕔 Dans 30 minutes (${used[6]})`,
-    `🕔 Dans 45 minutes (${used[7]})`,
-    `🕔 Dans 60 minutes (${used[8]})`
+    `🕔 5 minutes après l'heure de début (${used[1]})`,
+    `🕔 10 minutes après l'heure de début (${used[2]})`,
+    `🕔 15 minutes après l'heure de début (${used[3]})`,
+    `🕔 20 minutes après l'heure de début (${used[4]})`,
+    `🕔 25 minutes après l'heure de début (${used[5]})`,
+    `🕔 30 minutes après l'heure de début (${used[6]})`,
+    `🕔 45 minutes après l'heure de début (${used[7]})`,
+    `🕔 60 minutes après l'heure de début (${used[8]})`
   ]
 
   const momentStart = moment(task.start, "HH:mm")

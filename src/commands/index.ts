@@ -51,7 +51,7 @@ export class Commands {
         id: 'update-task-time',
         name: 'Update task time',
         icon: 'watch',
-        callback: () => updateTaskTime(this.app)
+        callback: async () => await updateTaskTime(this.app)
       });
       
       plugin.addCommand({
