@@ -54,20 +54,21 @@ export const addTask = async (app: App) => {
   const today = dateWithEmoji('today')
 
   const newTask = await askNewTask(app);
-  if (!newTask) return;
 
-  if (newTask.name === "🌙 Sommeil" && newTask.tasks) {
-    newTask.tasks.forEach(async (task) => {
-      const newLine = formatTaskString(task);
-      await addTaskToFileFromPath(app, task.metadata?.path, newLine)
-      await delay(1000)
+  if (newTask && newTask.name === "🌙 Sommeil" && newTask.tasks) {
+    newTask.tasks.forEach(async (el) => {
+      if (!el.task) return
+      const newLine = formatTaskString(el.task);
+      await addTaskToFileFromPath(app, el.task.metadata?.path, newLine)
+      await delay(100)
       return
     })
     return
   }
+  if (!newTask || !newTask.task) return;
 
     // Task
-  let task = newTask.tasks?.length ? await askTaskGroup(app, newTask.tasks) : newTask.task
+  let task = newTask.task
   if (!task) return;
 
   // Path
