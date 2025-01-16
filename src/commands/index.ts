@@ -6,6 +6,7 @@ import type Max13hPlugin from 'main';
 import { catchQuickThinking } from './catchQuickThinking';
 import { updateTaskTime } from './updateTaskTime';
 import { duplicateActualTask } from './duplicateActualTask';
+import { openWeeklyNote } from './openWeeklyNote';
 
 export class Commands {
     private readonly plugin: Max13hPlugin;
@@ -66,22 +67,12 @@ export class Commands {
           duplicateActualTask(editor, cursor, lineContent);
         }
       });
-      
 
-      // plugin.addCommand({
-      //   id: 'task-start-time-to-now',
-      //   name: 'Task start time to now',
-      //   checkCallback: (checking: boolean) => {
-      //     const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-      //     if (markdownView) {
-      //       const cursor = markdownView.editor.getCursor();
-      //       if (!cursor) return false;
-
-      //       if (!checking) updateTaskTime(this.app)
-      //       return true;
-      //     }
-      //     return false;
-      //   }
-      // });
+      plugin.addCommand({
+        id: 'open-weekly-note',
+        name: "Open weekly note for this week",
+        icon: 'watch',
+        callback: () => openWeeklyNote(this.app)
+      });
     }
 }
