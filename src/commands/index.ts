@@ -7,6 +7,7 @@ import { catchQuickThinking } from './catchQuickThinking';
 import { updateTaskTime } from './updateTaskTime';
 import { duplicateActualTask } from './duplicateActualTask';
 import { openWeeklyNote } from './openWeeklyNote';
+import { openWeeklyReport } from 'src/views/weeklyReport';
 
 export class Commands {
     private readonly plugin: Max13hPlugin;
@@ -47,14 +48,14 @@ export class Commands {
         icon: 'zap',
         callback: () => catchQuickThinking(this.app, plugin.settings)
       });
-      
+
       plugin.addCommand({
         id: 'update-task-time',
         name: 'Update task time',
         icon: 'watch',
         callback: async () => await updateTaskTime(this.app)
       });
-      
+
       plugin.addCommand({
         id: 'duplicate-actual-task',
         name: 'Duplicate actual task',
@@ -71,8 +72,15 @@ export class Commands {
       plugin.addCommand({
         id: 'open-weekly-note',
         name: "Open weekly note for this week",
-        icon: 'watch',
+        icon: 'calendar-days',
         callback: () => openWeeklyNote(this.app)
+      });
+
+      plugin.addCommand({
+        id: 'open-weekly-report',
+        name: "Open weekly report",
+        icon: 'chart-column-increasing',
+        callback: () => openWeeklyReport(this.app)
       });
     }
 }

@@ -1,6 +1,7 @@
-import { Plugin } from 'obsidian';
+import { Plugin, WorkspaceLeaf } from 'obsidian';
 import { Commands } from 'src/commands';
 import { Max13hSettingTab } from './settings'
+import { Views } from 'src/views';
 // Remember to rename these classes and interfaces!
 
 export interface Max13hPluginSettings {
@@ -22,8 +23,8 @@ export default class Max13hPlugin extends Plugin {
 		await this.loadSettings();
 		this.addSettingTab(new Max13hSettingTab(this.app, this));
 
-
 		new Commands({ plugin: this });
+		new Views({ plugin: this });
 	}
 
 	onunload() {}
